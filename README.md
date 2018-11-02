@@ -11,7 +11,7 @@ Required libraries:
 
 Adapt locations of libs in the Makefile (for OSX) and make the code. 
 
-To change number of threads for openMP, change the setting in the "defines.h". 
+To change number of threads for openMP, change the setting in "defines.h". 
 There are two defines: NUM_THREADS for the loops and NUM_THREADS_FFT for FFTW. 
 
 
