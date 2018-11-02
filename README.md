@@ -2,8 +2,11 @@
 interactive immersed boundary incmpressible Navier-Stokes code 
 
 Required libraries: 
+
 1.) openMP
+
 2.) FFTW (use ./configure --enable-float --enable-threads)
+
 3.) OpenGL utility toolkit (glut). If homebrew installed on MAC OS, simply use: "brew install freeglut"
 
 Adapt locations of libs in the Makefile (for OSX) and make the code. 
