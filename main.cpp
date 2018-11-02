@@ -61,7 +61,7 @@ using namespace std;
 int main(int argc, char** argv)
 {
 
-    initDisplay(argc, argv);
+	initDisplay(argc, argv);
 
 	initPressureSolver();
 
@@ -71,19 +71,19 @@ int main(int argc, char** argv)
 	obj.translate(POINT(-0.5, 0.0));
 	ibObj.push_back(obj);
 
-//	float umax, vmax;
+	//    float umax, vmax;
 	dt = calcDT();
 
 	setBCvelocity(u, v);
 
-//	float start = omp_get_wtime();
-//	for (int i=0; i<2000; i++)
-		timing = omp_get_wtime();
+	//    float start = omp_get_wtime();
+	//    for (int i=0; i<2000; i++)
+	timing = omp_get_wtime();
 
-		run();
+	run();
 
-//		run2();
-//	cout << "time = " << timing << "[s]" << endl;
+	//        run2();
+	//    cout << "time = " << timing << "[s]" << endl;
 
 
 	glutMainLoop();
@@ -122,7 +122,7 @@ void initPressureSolver() {
 	// init 1d dct in y direction Neumann
 	kind[0] = FFTW_REDFT10;
 	kind[1] = FFTW_REDFT01;
-	 dctNy = fftwf_plan_guru_r2r(rank, dims, howmany_rank, howmany_dims, pp, pp, &kind[0], FFTW_ESTIMATE);
+	dctNy = fftwf_plan_guru_r2r(rank, dims, howmany_rank, howmany_dims, pp, pp, &kind[0], FFTW_ESTIMATE);
 	idctNy = fftwf_plan_guru_r2r(rank, dims, howmany_rank, howmany_dims, pp, pp, &kind[1], FFTW_ESTIMATE);
 	for(int j=0; j<n; j++)  evNy[j] = -4.0*pow(sin(M_PI/2.0*j/n)/dx, 2.0);
 
@@ -130,9 +130,9 @@ void initPressureSolver() {
 	// init 1d dct in y direction Periodic
 	kind[0] = FFTW_R2HC;
 	kind[1] = FFTW_HC2R;
-	 dctPy = fftwf_plan_guru_r2r(rank, dims, howmany_rank, howmany_dims, pp, pp, &kind[0], FFTW_ESTIMATE);
+	dctPy = fftwf_plan_guru_r2r(rank, dims, howmany_rank, howmany_dims, pp, pp, &kind[0], FFTW_ESTIMATE);
 	idctPy = fftwf_plan_guru_r2r(rank, dims, howmany_rank, howmany_dims, pp, pp, &kind[1], FFTW_ESTIMATE);
-    for(int j=0; j<n; j++)  evPy[j] = -4.0*pow(sin(M_PI*j/n)/dx, 2.0);
+	for(int j=0; j<n; j++)  evPy[j] = -4.0*pow(sin(M_PI*j/n)/dx, 2.0);
 
 
 	// init 2d dct Periodic in x, Neumann in y
@@ -156,7 +156,7 @@ void initPressureSolver() {
 	// init 2d dct Periodic in x, Periodic in y
 	kind[0] = FFTW_R2HC;
 	kind[1] = FFTW_R2HC;
-	 dctPxPy = fftwf_plan_r2r_2d(m, n, pp, pp, kind[0], kind[1], FFTW_MEASURE);
+	dctPxPy = fftwf_plan_r2r_2d(m, n, pp, pp, kind[0], kind[1], FFTW_MEASURE);
 
 	kind[0] = FFTW_HC2R;
 	kind[1] = FFTW_HC2R;
@@ -169,7 +169,7 @@ void initPressureSolver() {
 
 
 
-	 dst = fftwf_plan_r2r_1d(jmax-2, profile, profile, FFTW_RODFT10, FFTW_MEASURE);
+	dst = fftwf_plan_r2r_1d(jmax-2, profile, profile, FFTW_RODFT10, FFTW_MEASURE);
 	idst = fftwf_plan_r2r_1d(jmax-2, profile, profile, FFTW_RODFT01, FFTW_MEASURE);
 }
 
@@ -177,11 +177,11 @@ void initPressureSolver() {
 
 void initFlowField() {
 	for (int i=0; i<imax*jmax; i++) {
-//		float y = dx*(j-0.5);
-//		 u[i] = 4*y*(1-y); //uInlet;
-	 	 u[i] = 1.0;
- 		 v[i] = 0.0;
-		 p[i] = 0.0;
+		//        float y = dx*(j-0.5);
+		//         u[i] = 4*y*(1-y); //uInlet;
+		u[i] = 1.0;
+		v[i] = 0.0;
+		p[i] = 0.0;
 		us[i] = 0.0;
 		vs[i] = 0.0;
 		ps[i] = 0.0;
@@ -194,33 +194,33 @@ float calcDT()
 {
 	umax = 0.0, vmax = 0;
 
-//	for (int i=0; i<imax*jmax; i++) u_max = max(fabs(u[i]), u_max);
-//	for (int i=0; i<imax*jmax; i++) v_max = max(fabs(v[i]), v_max);
+	//    for (int i=0; i<imax*jmax; i++) u_max = max(fabs(u[i]), u_max);
+	//    for (int i=0; i<imax*jmax; i++) v_max = max(fabs(v[i]), v_max);
 
 	for (int i=0; i<imax-1; i++)
-	for (int j=1; j<jmax-1; j++)
-		umax = MAX(fabs(u[ind(i,j)]), umax);
+		for (int j=1; j<jmax-1; j++)
+			umax = MAX(fabs(u[ind(i,j)]), umax);
 
 	for (int i=1; i<imax-1; i++)
-	for (int j=0; j<jmax-1; j++)
-		vmax = MAX(fabs(v[ind(i,j)]), vmax);
+		for (int j=0; j<jmax-1; j++)
+			vmax = MAX(fabs(v[ind(i,j)]), vmax);
 
-    return CFL/( 4.0/(dx*dx*Re) + (umax+vmax)/dx);
+	return CFL/( 4.0/(dx*dx*Re) + (umax+vmax)/dx);
 }
 
 
 
 void calcDiv(float &divVolMax, float &divVolTot)
 {
-    divVolMax = -1.0e10;
-    divVolTot =  0.0;
+	divVolMax = -1.0e10;
+	divVolTot =  0.0;
 
 	for (int i=1; i<imax-1; i++)
-	for (int j=1; j<jmax-1; j++) {
-		float divVol = (u[ind(i,j)]-u[ind(i-1,j)] + v[ind(i,j)]-v[ind(i,j-1)])*dx;
-		divVolTot = divVolTot + divVol;
-		divVolMax = MAX(divVolMax, divVol);
-	}
+		for (int j=1; j<jmax-1; j++) {
+			float divVol = (u[ind(i,j)]-u[ind(i-1,j)] + v[ind(i,j)]-v[ind(i,j-1)])*dx;
+			divVolTot = divVolTot + divVol;
+			divVolMax = MAX(divVolMax, divVol);
+		}
 }
 
 
@@ -263,7 +263,7 @@ void setBCpressure(float *p)
 
 void setBCvelocity(float *u, float *v)
 {
-    // BC TOP and BOTTOM
+	// BC TOP and BOTTOM
 	switch (wall) {
 	case 1:
 		for (int i=0; i<imax; i++) {
@@ -300,7 +300,7 @@ void setBCvelocity(float *u, float *v)
 	// BC INFLOW AND OUTFLOW
 	if (periodicX == false) {
 
-//        bool flagBackFlow = false;
+		//        bool flagBackFlow = false;
 
 		float umean = 0.0;
 		for (int j=1; j<jmax-1; j++)  umean += 0.5*(u[ind(imax-2,j)]+u[ind(imax-3,j)])*dx;
@@ -309,65 +309,65 @@ void setBCvelocity(float *u, float *v)
 		for (int j=1; j<jmax-1; j++) {
 			float y = dx*(j-0.5);
 			u[ind(0,j)] = 1.0; //4*y*(1-y); //uInlet;
-//			u[ind(imax-2,j)] = u[ind(imax-3,j)] - (v[ind(imax-2,j)]-v[ind(imax-2,j-1)]);
+			//            u[ind(imax-2,j)] = u[ind(imax-3,j)] - (v[ind(imax-2,j)]-v[ind(imax-2,j-1)]);
 
 			u[ind(imax-2,j)] = u[ind(imax-2,j)] - dt/dx*umean*(u[ind(imax-2,j)] - u[ind(imax-3,j)]); // - (v[ind(imax-2,j)]-v[ind(imax-2,j-1)]);
-//			u[ind(imax-2,j)] = u[ind(imax-2,j)] - dt/dx*u[ind(imax-3,j)]*(u[ind(imax-2,j)] - u[ind(imax-3,j)]); // - (v[ind(imax-2,j)]-v[ind(imax-2,j-1)]);
+			//            u[ind(imax-2,j)] = u[ind(imax-2,j)] - dt/dx*u[ind(imax-3,j)]*(u[ind(imax-2,j)] - u[ind(imax-3,j)]); // - (v[ind(imax-2,j)]-v[ind(imax-2,j-1)]);
 
-//			if (u[ind(imax-2,j)] < 0.0) flagBackFlow = true;
+			//            if (u[ind(imax-2,j)] < 0.0) flagBackFlow = true;
 
-//			profile[j-1] = u[ind(imax-2,j)];
-//			u[ind(imax-1,j)] = u[ind(imax-2,j)];
+			//            profile[j-1] = u[ind(imax-2,j)];
+			//            u[ind(imax-1,j)] = u[ind(imax-2,j)];
 
 			v[ind(0,j)] = vInlet; //-v[ind(1,j)];
 			v[ind(imax-1,j)] = v[ind(imax-2,j)];
 		}
 
-//		if (flagBackFlow == true) {
-//			fftwf_execute(dst);
-//			for (int j=jmax-10; j<jmax-2; j++)  profile[j] = 0.0;
-//			fftwf_execute(idst);
-//			for (int j=1; j<jmax-1; j++)   u[ind(imax-2,j)] = profile[j-1]/(2*(jmax-2));
-//		}
+		//        if (flagBackFlow == true) {
+		//            fftwf_execute(dst);
+		//            for (int j=jmax-10; j<jmax-2; j++)  profile[j] = 0.0;
+		//            fftwf_execute(idst);
+		//            for (int j=1; j<jmax-1; j++)   u[ind(imax-2,j)] = profile[j-1]/(2*(jmax-2));
+		//        }
 
-//		if (flagBackFlow == true) {
-//
-//		}
-		
-//		if (flagBackFlow == true) {
-//  		  double weight = 0.7;
-//		  for (int j=1; j<jmax-1; j++)
-//			  u[ind(imax-2,j)] = weight*u[ind(imax-2,j)] + (1-weight)/2.0*(u[ind(imax-2,j+1)] + u[ind(imax-2,j-1)]);
-//		}
+		//        if (flagBackFlow == true) {
+		//
+		//        }
+
+		//        if (flagBackFlow == true) {
+		//            double weight = 0.7;
+		//          for (int j=1; j<jmax-1; j++)
+		//              u[ind(imax-2,j)] = weight*u[ind(imax-2,j)] + (1-weight)/2.0*(u[ind(imax-2,j+1)] + u[ind(imax-2,j-1)]);
+		//        }
 
 		float MFin = 0.0;
 		float MFout = 0.0;
 		float dMF;
 		for (int j=1; j<jmax-1; j++) {
-		   MFin  = MFin  + u[j]*dx;
-		   MFout = MFout + u[(imax-2)*jmax+j]*dx;
+			MFin  = MFin  + u[j]*dx;
+			MFout = MFout + u[(imax-2)*jmax+j]*dx;
 		}
 
-		 dMF = MFin - MFout;
-		 //dMF = MFin/MFout;
+		dMF = MFin - MFout;
+		//dMF = MFin/MFout;
 
-//	//	if (fabs(MFout) < 1.0e-15) 		MFout = 1e20;
+		//    //    if (fabs(MFout) < 1.0e-15)         MFout = 1e20;
 
 		for (int j=1; j<jmax-1; j++) {
 			u[(imax-2)*jmax+j] += dMF;   //u[(imax-2)*jmax+j] + u[(imax-2)*jmax+j] * dx * dMF/MFout;
 			u[(imax-1)*jmax+j] = u[(imax-2)*jmax+j];
 		}
 
-//		MFin = 0.0;
-//		MFout = 0.0;
-//		for (int j=1; j<jmax-1; j++) {
-//		   MFin  = MFin  + u[j]*dx;
-//		   MFout = MFout + u[ind(imax-2,j)]*dx;
-////		   printf("%d\t%lf\t%lf\t%lf\t%lf\t%lf\n", j, u[ind(0,j)], u[ind(imax-3,j)], u[ind(imax-2,j)], v[ind(imax-2,j)], v[ind(imax-1,j)]);
-//		}
+		//        MFin = 0.0;
+		//        MFout = 0.0;
+		//        for (int j=1; j<jmax-1; j++) {
+		//           MFin  = MFin  + u[j]*dx;
+		//           MFout = MFout + u[ind(imax-2,j)]*dx;
+		////           printf("%d\t%lf\t%lf\t%lf\t%lf\t%lf\n", j, u[ind(0,j)], u[ind(imax-3,j)], u[ind(imax-2,j)], v[ind(imax-2,j)], v[ind(imax-1,j)]);
+		//        }
 
-//		dMF = MFin - MFout;
-//		printf("%lf\t%lf\t%lf\n", MFin, MFout, dMF);
+		//        dMF = MFin - MFout;
+		//        printf("%lf\t%lf\t%lf\n", MFin, MFout, dMF);
 
 	}
 	else {
@@ -381,7 +381,7 @@ void setBCvelocity(float *u, float *v)
 	}
 
 
-    // set immersed boundaries
+	// set immersed boundaries
 	for (int obj=0; obj<ibObj.size(); obj++) {
 		for (int ib=0; ib<ibObj[obj].iIB.size(); ib++) {
 			int i = ibObj[obj].iIB[ib].i;
@@ -414,7 +414,7 @@ void run()
 		setBCvelocity(us, vs);
 		break;
 
-	// AB2 ----------------------------------------------------------------------------------------
+		// AB2 ----------------------------------------------------------------------------------------
 	case 2:
 		calcRhs(rhsX1, rhsY1, u, v);
 
@@ -428,17 +428,17 @@ void run()
 		else {
 			if (change == false) {
 #pragma omp parallel for num_threads(NUM_THREADS)
-			for (int i=jmax+1; i<(imax-1)*jmax-1; i++) us[i] = u[i] + dt*(1.5*rhsX1[i] - 0.5*rhsX2[i]);
+				for (int i=jmax+1; i<(imax-1)*jmax-1; i++) us[i] = u[i] + dt*(1.5*rhsX1[i] - 0.5*rhsX2[i]);
 #pragma omp parallel for num_threads(NUM_THREADS)
-			for (int i=jmax+1; i<(imax-1)*jmax-1; i++) vs[i] = v[i] + dt*(1.5*rhsY1[i] - 0.5*rhsY2[i]);
-			setBCvelocity(us, vs);
+				for (int i=jmax+1; i<(imax-1)*jmax-1; i++) vs[i] = v[i] + dt*(1.5*rhsY1[i] - 0.5*rhsY2[i]);
+				setBCvelocity(us, vs);
 			}
 			else {
 #pragma omp parallel for num_threads(NUM_THREADS)
-			for (int i=jmax+1; i<(imax-1)*jmax-1; i++) us[i] = u[i] + dt*(1.51*rhsX1[i] - 0.51*rhsX2[i]);
+				for (int i=jmax+1; i<(imax-1)*jmax-1; i++) us[i] = u[i] + dt*(1.51*rhsX1[i] - 0.51*rhsX2[i]);
 #pragma omp parallel for num_threads(NUM_THREADS)
-			for (int i=jmax+1; i<(imax-1)*jmax-1; i++) vs[i] = v[i] + dt*(1.51*rhsY1[i] - 0.51*rhsY2[i]);
-			setBCvelocity(us, vs);
+				for (int i=jmax+1; i<(imax-1)*jmax-1; i++) vs[i] = v[i] + dt*(1.51*rhsY1[i] - 0.51*rhsY2[i]);
+				setBCvelocity(us, vs);
 			}
 
 		}
@@ -449,7 +449,7 @@ void run()
 		for (int i=jmax+1; i<(imax-1)*jmax-1; i++) rhsY2[i] = rhsY1[i];
 		break;
 
-	// RK3 ----------------------------------------------------------------------------------------
+		// RK3 ----------------------------------------------------------------------------------------
 	case 3:
 		calcRhs(rhsX1,  rhsY1,  u,  v);
 #pragma omp parallel for num_threads(NUM_THREADS)
@@ -473,7 +473,7 @@ void run()
 		setBCvelocity(us, vs);
 		break;
 
-	// RK4 ----------------------------------------------------------------------------------------
+		// RK4 ----------------------------------------------------------------------------------------
 	case 4:
 		calcRhs(rhsX1,  rhsY1,  u,  v);
 #pragma omp parallel for num_threads(NUM_THREADS)
@@ -550,7 +550,7 @@ void run()
 
 	if ((istep%15) == 0) display();
 
-//	float umax = 0.0, vmax = 0.0;
+	//    float umax = 0.0, vmax = 0.0;
 	if ((istep%5) == 0)  dt = calcDT();
 
 	if ((istep%1000) == 0) {
@@ -571,42 +571,42 @@ void run()
 	}
 
 
-//	if ((istep%50000) == 0) {
-//		FILE *fp = fopen("out.txt", "wt");
-//		for (int i=1; i<imax-2; i++) {
-//
-//			float mass = 0.0, mom = 0.0, pre = 0.0;
-//			for (int j=1; j<jmax-1; j++) {
-//				mass += 0.5*(u[ind(i-1,j)] + u[ind(i,j)])*dx;
-//				mom += pow(0.5*(u[ind(i-1,j)] + u[ind(i,j)]), 2.0)*dx;
-//				pre += p[ind(i,j)]*dx;
-//			}
-//
-//			fprintf(fp, "%f\t%f\t", dx*(i-1), u[ind(i-1,jmax/2-1)]);
-//			fprintf(fp, "%f\t%f\t%f\t", dx*(i-0.5), (u[ind(i-1,jmax/2-1)] + u[ind(i,jmax/2-1)])/2.0, p[ind(i,jmax/2-1)]);
-//			fprintf(fp, "%f\t%f\t%f\n", mass, mom, pre);
-//		}
-//		fclose(fp);
-////
-////		fp = fopen("integral.txt", "wt");
-////		fclose(fp);
-//	}
+	//    if ((istep%50000) == 0) {
+	//        FILE *fp = fopen("out.txt", "wt");
+	//        for (int i=1; i<imax-2; i++) {
+	//
+	//            float mass = 0.0, mom = 0.0, pre = 0.0;
+	//            for (int j=1; j<jmax-1; j++) {
+	//                mass += 0.5*(u[ind(i-1,j)] + u[ind(i,j)])*dx;
+	//                mom += pow(0.5*(u[ind(i-1,j)] + u[ind(i,j)]), 2.0)*dx;
+	//                pre += p[ind(i,j)]*dx;
+	//            }
+	//
+	//            fprintf(fp, "%f\t%f\t", dx*(i-1), u[ind(i-1,jmax/2-1)]);
+	//            fprintf(fp, "%f\t%f\t%f\t", dx*(i-0.5), (u[ind(i-1,jmax/2-1)] + u[ind(i,jmax/2-1)])/2.0, p[ind(i,jmax/2-1)]);
+	//            fprintf(fp, "%f\t%f\t%f\n", mass, mom, pre);
+	//        }
+	//        fclose(fp);
+	////
+	////        fp = fopen("integral.txt", "wt");
+	////        fclose(fp);
+	//    }
 
 	istep = istep + 1;
 	simtime += dt;
 
 
-//	float freq = (float)istep*0.005*2.0*M_PI;
-//
-//	for (int ib = 0; ib<nIB; ib++)
-//	{
-//		float xBody = 40.0*pow(cos(freq),333.0);
-//		float yBody = 20.0*pow(sin(freq),333.0);
-//		indexIB[ib][0] = indexIBOrig[ib][0] + xBody+60;
-//		indexIB[ib][1] = indexIBOrig[ib][1] + yBody;
-//	}
-//
-//	cout << "time = " << (clock() - start)/(float)(CLOCKS_PER_SEC) << "[s]" << endl;
+	//    float freq = (float)istep*0.005*2.0*M_PI;
+	//
+	//    for (int ib = 0; ib<nIB; ib++)
+	//    {
+	//        float xBody = 40.0*pow(cos(freq),333.0);
+	//        float yBody = 20.0*pow(sin(freq),333.0);
+	//        indexIB[ib][0] = indexIBOrig[ib][0] + xBody+60;
+	//        indexIB[ib][1] = indexIBOrig[ib][1] + yBody;
+	//    }
+	//
+	//    cout << "time = " << (clock() - start)/(float)(CLOCKS_PER_SEC) << "[s]" << endl;
 }
 
 
@@ -650,11 +650,11 @@ void calcRhs(float *rhsX, float *rhsY, float *u, float *v) {
 
 void calcRhsCentral(float *rhsX, float *rhsY, float *u, float *v) {
 
-    float dxi = 1.0/dx;
-    float dx2Rei = dxi*dxi/Re;
-    float uuip05[imax*jmax], vvjp05[imax*jmax], uvp05[imax*jmax];
+	float dxi = 1.0/dx;
+	float dx2Rei = dxi*dxi/Re;
+	float uuip05[imax*jmax], vvjp05[imax*jmax], uvp05[imax*jmax];
 
-    // calculate nonlinear terms of velocity
+	// calculate nonlinear terms of velocity
 #pragma omp parallel for num_threads(NUM_THREADS)
 	for (int i=0; i<(imax-1)*jmax; i++)
 		uuip05[i] = 0.25*powf(u[i+jmax] + u[i], 2.0);
@@ -668,152 +668,152 @@ void calcRhsCentral(float *rhsX, float *rhsY, float *u, float *v) {
 		uvp05[i] = 0.25*(u[i+1]+u[i])*(v[i+jmax]+v[i]);
 
 
-    // x - momentum
+	// x - momentum
 #pragma omp parallel for num_threads(NUM_THREADS)
-    for (int i=jmax+1; i<(imax-1)*jmax-1; i++)
+	for (int i=jmax+1; i<(imax-1)*jmax-1; i++)
 		rhsX[i] = -dxi*(uuip05[i]-uuip05[i-jmax] + uvp05[i]-uvp05[i-1] + p[i+jmax]-p[i]) + dx2Rei*(u[i+jmax]+u[i-jmax]+u[i+1]+u[i-1]-4.0*u[i]);
 
-    // y - momentum
+	// y - momentum
 #pragma omp parallel for num_threads(NUM_THREADS)
-    for (int i=jmax+1; i<(imax-1)*jmax-1; i++)
-        rhsY[i] = -dxi*(uvp05[i]-uvp05[i-jmax] + vvjp05[i]-vvjp05[i-1] + p[i+1]-p[i]) + dx2Rei*(v[i+jmax]+v[i-jmax]+v[i+1]+v[i-1]-4.0*v[i]);
+	for (int i=jmax+1; i<(imax-1)*jmax-1; i++)
+		rhsY[i] = -dxi*(uvp05[i]-uvp05[i-jmax] + vvjp05[i]-vvjp05[i-1] + p[i+1]-p[i]) + dx2Rei*(v[i+jmax]+v[i-jmax]+v[i+1]+v[i-1]-4.0*v[i]);
 
-    // IB forcing
-    for (int obj=0; obj<ibObj.size(); obj++) {
+	// IB forcing
+	for (int obj=0; obj<ibObj.size(); obj++) {
 		for (int ib=0; ib<ibObj[obj].iIB.size(); ib++) {
 			int i = ibObj[obj].iIB[ib].i-1;
 			int j = ibObj[obj].iIB[ib].j-1;     rhsX[ind(i,j)] += (dxi*uvp05[ind(i,j)]   - dx2Rei*(u[ind(i,j+1)]+u[ind(i,j)]));
-				i = ibObj[obj].iIB[ib].i;       rhsX[ind(i,j)] += (dxi*uvp05[ind(i,j)]   - dx2Rei*(u[ind(i,j+1)]+u[ind(i,j)]));
-				j = ibObj[obj].iIB[ib].j+1;     rhsX[ind(i,j)] -= (dxi*uvp05[ind(i,j-1)] + dx2Rei*(u[ind(i,j)]+u[ind(i,j-1)]));
-				i = ibObj[obj].iIB[ib].i-1;     rhsX[ind(i,j)] -= (dxi*uvp05[ind(i,j-1)] + dx2Rei*(u[ind(i,j)]+u[ind(i,j-1)]));
+			i = ibObj[obj].iIB[ib].i;       rhsX[ind(i,j)] += (dxi*uvp05[ind(i,j)]   - dx2Rei*(u[ind(i,j+1)]+u[ind(i,j)]));
+			j = ibObj[obj].iIB[ib].j+1;     rhsX[ind(i,j)] -= (dxi*uvp05[ind(i,j-1)] + dx2Rei*(u[ind(i,j)]+u[ind(i,j-1)]));
+			i = ibObj[obj].iIB[ib].i-1;     rhsX[ind(i,j)] -= (dxi*uvp05[ind(i,j-1)] + dx2Rei*(u[ind(i,j)]+u[ind(i,j-1)]));
 
-				j = ibObj[obj].iIB[ib].j-1;     rhsY[ind(i,j)] += (dxi*uvp05[ind(i,j)]   - dx2Rei*(v[ind(i+1,j)]+v[ind(i,j)]));
-				j = ibObj[obj].iIB[ib].j;       rhsY[ind(i,j)] += (dxi*uvp05[ind(i,j)]   - dx2Rei*(v[ind(i+1,j)]+v[ind(i,j)]));
-				i = ibObj[obj].iIB[ib].i+1;     rhsY[ind(i,j)] -= (dxi*uvp05[ind(i-1,j)] + dx2Rei*(v[ind(i,j)]+v[ind(i-1,j)]));
-				j = ibObj[obj].iIB[ib].j-1;     rhsY[ind(i,j)] -= (dxi*uvp05[ind(i-1,j)] + dx2Rei*(v[ind(i,j)]+v[ind(i-1,j)]));
+			j = ibObj[obj].iIB[ib].j-1;     rhsY[ind(i,j)] += (dxi*uvp05[ind(i,j)]   - dx2Rei*(v[ind(i+1,j)]+v[ind(i,j)]));
+			j = ibObj[obj].iIB[ib].j;       rhsY[ind(i,j)] += (dxi*uvp05[ind(i,j)]   - dx2Rei*(v[ind(i+1,j)]+v[ind(i,j)]));
+			i = ibObj[obj].iIB[ib].i+1;     rhsY[ind(i,j)] -= (dxi*uvp05[ind(i-1,j)] + dx2Rei*(v[ind(i,j)]+v[ind(i-1,j)]));
+			j = ibObj[obj].iIB[ib].j-1;     rhsY[ind(i,j)] -= (dxi*uvp05[ind(i-1,j)] + dx2Rei*(v[ind(i,j)]+v[ind(i-1,j)]));
 		}
-    }
+	}
 }
 
 
 
 void calcRhsQUICK(float *rhsX, float *rhsY, float *u, float *v) {
 
-    float dxi = 1.0/dx;
-    float dx2Rei = dxi*dxi/Re;
-    float vAtU[imax*jmax], uAtV[imax*jmax];
-    float phi = 1.0/8.0;
-//    float phi = 0.0;
+	float dxi = 1.0/dx;
+	float dx2Rei = dxi*dxi/Re;
+	float vAtU[imax*jmax], uAtV[imax*jmax];
+	float phi = 1.0/8.0;
+	//    float phi = 0.0;
 
 #pragma omp parallel for num_threads(NUM_THREADS)
-    for (int i=jmax+1; i<(imax-1)*jmax-1; i++)
+	for (int i=jmax+1; i<(imax-1)*jmax-1; i++)
 		vAtU[i] = 0.25*(v[i] + v[i-1] + v[i+jmax] + v[i+jmax-1]);
 
 #pragma omp parallel for num_threads(NUM_THREADS)
-    for (int i=jmax+1; i<(imax-1)*jmax-1; i++)
+	for (int i=jmax+1; i<(imax-1)*jmax-1; i++)
 		uAtV[i] = 0.25*(u[i] + u[i-jmax] + u[i+1] + u[i-jmax+1]);
 
 
 
-    // x - momentum
+	// x - momentum
 #pragma omp parallel for num_threads(NUM_THREADS)
 	for (int i=1; i<imax-1; i++)
-	for (int j=1; j<jmax-1; j++)
-	{
-		rhsX[ind(i,j)] = -0.5*phi*( u[ind(i,j)]*(u[ind(i+1,j)]-u[ind(i-1,j)]) + vAtU[ind(i,j)]*(u[ind(i,j+1)]-u[ind(i,j-1)]) ) - (p[ind(i+1,j)] - p[ind(i,j)]);
+		for (int j=1; j<jmax-1; j++)
+		{
+			rhsX[ind(i,j)] = -0.5*phi*( u[ind(i,j)]*(u[ind(i+1,j)]-u[ind(i-1,j)]) + vAtU[ind(i,j)]*(u[ind(i,j+1)]-u[ind(i,j-1)]) ) - (p[ind(i+1,j)] - p[ind(i,j)]);
 
-		if ((u[ind(i,j)] > 0.0) && (i>1))          rhsX[ind(i,j)] -= u[ind(i,j)]*(1.0-phi)*(1.5*u[ind(i,j)]-2.0*u[ind(i-1,j)]+0.5*u[ind(i-2,j)]);
-		if ((u[ind(i,j)] < 0.0) && (i<imax-2))     rhsX[ind(i,j)] += u[ind(i,j)]*(1.0-phi)*(1.5*u[ind(i,j)]-2.0*u[ind(i+1,j)]+0.5*u[ind(i+2,j)]);
+			if ((u[ind(i,j)] > 0.0) && (i>1))          rhsX[ind(i,j)] -= u[ind(i,j)]*(1.0-phi)*(1.5*u[ind(i,j)]-2.0*u[ind(i-1,j)]+0.5*u[ind(i-2,j)]);
+			if ((u[ind(i,j)] < 0.0) && (i<imax-2))     rhsX[ind(i,j)] += u[ind(i,j)]*(1.0-phi)*(1.5*u[ind(i,j)]-2.0*u[ind(i+1,j)]+0.5*u[ind(i+2,j)]);
 
-		if ((vAtU[ind(i,j)] > 0.0) && (j>1))       rhsX[ind(i,j)] -= vAtU[ind(i,j)]*(1.0-phi)*(1.5*u[ind(i,j)]-2.0*u[ind(i,j-1)]+0.5*u[ind(i,j-2)]);
-		if ((vAtU[ind(i,j)] < 0.0) && (j<jmax-2))  rhsX[ind(i,j)] += vAtU[ind(i,j)]*(1.0-phi)*(1.5*u[ind(i,j)]-2.0*u[ind(i,j+1)]+0.5*u[ind(i,j+2)]);
+			if ((vAtU[ind(i,j)] > 0.0) && (j>1))       rhsX[ind(i,j)] -= vAtU[ind(i,j)]*(1.0-phi)*(1.5*u[ind(i,j)]-2.0*u[ind(i,j-1)]+0.5*u[ind(i,j-2)]);
+			if ((vAtU[ind(i,j)] < 0.0) && (j<jmax-2))  rhsX[ind(i,j)] += vAtU[ind(i,j)]*(1.0-phi)*(1.5*u[ind(i,j)]-2.0*u[ind(i,j+1)]+0.5*u[ind(i,j+2)]);
 
-		rhsX[ind(i,j)] = rhsX[ind(i,j)]*dxi + dx2Rei*(u[ind(i+1,j)] + u[ind(i-1,j)] + u[ind(i,j+1)] + u[ind(i,j-1)] - 4*u[ind(i,j)]);
-	}
+			rhsX[ind(i,j)] = rhsX[ind(i,j)]*dxi + dx2Rei*(u[ind(i+1,j)] + u[ind(i-1,j)] + u[ind(i,j+1)] + u[ind(i,j-1)] - 4*u[ind(i,j)]);
+		}
 
 
-    // y - momentum
+	// y - momentum
 #pragma omp parallel for num_threads(NUM_THREADS)
 	for (int i=1; i<imax-1; i++)
-	for (int j=1; j<jmax-1; j++)
-	{
-		rhsY[ind(i,j)] = -0.5*phi*( uAtV[ind(i,j)]*(v[ind(i+1,j)]-v[ind(i-1,j)]) + v[ind(i,j)]*(v[ind(i,j+1)]-v[ind(i,j-1)]) ) - (p[ind(i,j+1)] - p[ind(i,j)]);
+		for (int j=1; j<jmax-1; j++)
+		{
+			rhsY[ind(i,j)] = -0.5*phi*( uAtV[ind(i,j)]*(v[ind(i+1,j)]-v[ind(i-1,j)]) + v[ind(i,j)]*(v[ind(i,j+1)]-v[ind(i,j-1)]) ) - (p[ind(i,j+1)] - p[ind(i,j)]);
 
-		if ((uAtV[ind(i,j)] > 0.0) && (i>1))       rhsY[ind(i,j)] -= uAtV[ind(i,j)]*(1.0-phi)*(1.5*v[ind(i,j)]-2.0*v[ind(i-1,j)]+0.5*v[ind(i-1,j)]);
-		if ((uAtV[ind(i,j)] < 0.0) && (i<imax-2))  rhsY[ind(i,j)] += uAtV[ind(i,j)]*(1.0-phi)*(1.5*v[ind(i,j)]-2.0*v[ind(i+1,j)]+0.5*v[ind(i+2,j)]);
+			if ((uAtV[ind(i,j)] > 0.0) && (i>1))       rhsY[ind(i,j)] -= uAtV[ind(i,j)]*(1.0-phi)*(1.5*v[ind(i,j)]-2.0*v[ind(i-1,j)]+0.5*v[ind(i-1,j)]);
+			if ((uAtV[ind(i,j)] < 0.0) && (i<imax-2))  rhsY[ind(i,j)] += uAtV[ind(i,j)]*(1.0-phi)*(1.5*v[ind(i,j)]-2.0*v[ind(i+1,j)]+0.5*v[ind(i+2,j)]);
 
-		if ((v[ind(i,j)] > 0.0) && (j>1))          rhsY[ind(i,j)] -= v[ind(i,j)]*(1.0-phi)*(1.5*v[ind(i,j)]-2.0*v[ind(i,j-1)]+0.5*v[ind(i,j-2)]);
-		if ((v[ind(i,j)] < 0.0) && (j<jmax-2))     rhsY[ind(i,j)] += v[ind(i,j)]*(1.0-phi)*(1.5*v[ind(i,j)]-2.0*v[ind(i,j+1)]+0.5*v[ind(i,j+2)]);
+			if ((v[ind(i,j)] > 0.0) && (j>1))          rhsY[ind(i,j)] -= v[ind(i,j)]*(1.0-phi)*(1.5*v[ind(i,j)]-2.0*v[ind(i,j-1)]+0.5*v[ind(i,j-2)]);
+			if ((v[ind(i,j)] < 0.0) && (j<jmax-2))     rhsY[ind(i,j)] += v[ind(i,j)]*(1.0-phi)*(1.5*v[ind(i,j)]-2.0*v[ind(i,j+1)]+0.5*v[ind(i,j+2)]);
 
-		rhsY[ind(i,j)] = rhsY[ind(i,j)]*dxi + dx2Rei*(v[ind(i+1,j)] + v[ind(i-1,j)] + v[ind(i,j+1)] + v[ind(i,j-1)] - 4*v[ind(i,j)]);
-	}
-
-
+			rhsY[ind(i,j)] = rhsY[ind(i,j)]*dxi + dx2Rei*(v[ind(i+1,j)] + v[ind(i-1,j)] + v[ind(i,j+1)] + v[ind(i,j-1)] - 4*v[ind(i,j)]);
+		}
 
 
-//    // x - momentum
-////	for (int k=1; k<imax-1; k++)
-////	for (int l=1; l<jmax-1; l++)
-//#pragma omp parallel for num_threads(NUM_THREADS)
-//    for (int i=jmax+1; i<(imax-1)*jmax-1; i++)
-//	{
-//		if (u[i] > 0.0) 		rhsX[i] = -u[i]*(0.5*phi*(u[ip1[i]]-u[im1[i]]) + (1.0-phi)*(1.5*u[i]-2.0*u[im1[i]]+0.5*u[im2[i]]))*dxi;
-//		else					rhsX[i] = +u[i]*(0.5*phi*(u[ip1[i]]-u[im1[i]]) + (1.0-phi)*(1.5*u[i]-2.0*u[ip1[i]]+0.5*u[ip2[i]]))*dxi;
-//
-//		if (vAtU[i] > 0.0) 		rhsX[i] -= vAtU[i]*(0.5*phi*(u[jp1[i]]-u[jm1[i]]) + (1.0-phi)*(1.5*u[i]-2.0*u[jm1[i]]+0.5*u[jm2[i]]))*dxi;
-//		else					rhsX[i] += vAtU[i]*(0.5*phi*(u[jp1[i]]-u[jm1[i]]) + (1.0-phi)*(1.5*u[i]-2.0*u[jp1[i]]+0.5*u[jp2[i]]))*dxi;
-//
-//		rhsX[i] += dx2Rei*(u[ip1[i]] + u[im1[i]] + u[jp1[i]] + u[jm1[i]] - 4*u[i]);
-//		rhsX[i] -= (p[ip1[i]] - p[i])*dxi;
-//	}
-//    // y - momentum
-////	for (int k=1; k<imax-1; k++)
-////	for (int l=1; l<jmax-1; l++)
-//#pragma omp parallel for num_threads(NUM_THREADS)
-//    for (int i=jmax+1; i<(imax-1)*jmax-1; i++)
-//	{
-//		if (uAtV[i] > 0.0) 		rhsY[i] = -uAtV[i]*(0.5*phi*(v[ip1[i]]-v[im1[i]])+(1.0-phi)*(1.5*v[i]-2.0*v[im1[i]]+0.5*v[im2[i]]))*dxi;
-//		else					rhsY[i] = +uAtV[i]*(0.5*phi*(v[ip1[i]]-v[im1[i]])+(1.0-phi)*(1.5*v[i]-2.0*v[ip1[i]]+0.5*v[ip2[i]]))*dxi;
-//
-//		if (v[i] > 0.0) 		rhsY[i] -= v[i]*(0.5*phi*(v[jp1[i]]-v[jm1[i]])+(1.0-phi)*(1.5*v[i]-2.0*v[jm1[i]]+0.5*v[jm2[i]]))*dxi;
-//		else					rhsY[i] += v[i]*(0.5*phi*(v[jp1[i]]-v[jm1[i]])+(1.0-phi)*(1.5*v[i]-2.0*v[jp1[i]]+0.5*v[jp2[i]]))*dxi;
-//
-//		rhsY[i] += dx2Rei*(v[ip1[i]] + v[im1[i]] + v[jp1[i]] + v[jm1[i]] - 4*v[i]);
-//		rhsY[i] -= (p[jp1[i]] - p[i])*dxi;
-//	}
 
-    // IB forcing
-    for (int obj=0; obj<ibObj.size(); obj++) {
+
+	//    // x - momentum
+	////    for (int k=1; k<imax-1; k++)
+	////    for (int l=1; l<jmax-1; l++)
+	//#pragma omp parallel for num_threads(NUM_THREADS)
+	//    for (int i=jmax+1; i<(imax-1)*jmax-1; i++)
+	//    {
+	//        if (u[i] > 0.0)         rhsX[i] = -u[i]*(0.5*phi*(u[ip1[i]]-u[im1[i]]) + (1.0-phi)*(1.5*u[i]-2.0*u[im1[i]]+0.5*u[im2[i]]))*dxi;
+	//        else                    rhsX[i] = +u[i]*(0.5*phi*(u[ip1[i]]-u[im1[i]]) + (1.0-phi)*(1.5*u[i]-2.0*u[ip1[i]]+0.5*u[ip2[i]]))*dxi;
+	//
+	//        if (vAtU[i] > 0.0)         rhsX[i] -= vAtU[i]*(0.5*phi*(u[jp1[i]]-u[jm1[i]]) + (1.0-phi)*(1.5*u[i]-2.0*u[jm1[i]]+0.5*u[jm2[i]]))*dxi;
+	//        else                    rhsX[i] += vAtU[i]*(0.5*phi*(u[jp1[i]]-u[jm1[i]]) + (1.0-phi)*(1.5*u[i]-2.0*u[jp1[i]]+0.5*u[jp2[i]]))*dxi;
+	//
+	//        rhsX[i] += dx2Rei*(u[ip1[i]] + u[im1[i]] + u[jp1[i]] + u[jm1[i]] - 4*u[i]);
+	//        rhsX[i] -= (p[ip1[i]] - p[i])*dxi;
+	//    }
+	//    // y - momentum
+	////    for (int k=1; k<imax-1; k++)
+	////    for (int l=1; l<jmax-1; l++)
+	//#pragma omp parallel for num_threads(NUM_THREADS)
+	//    for (int i=jmax+1; i<(imax-1)*jmax-1; i++)
+	//    {
+	//        if (uAtV[i] > 0.0)         rhsY[i] = -uAtV[i]*(0.5*phi*(v[ip1[i]]-v[im1[i]])+(1.0-phi)*(1.5*v[i]-2.0*v[im1[i]]+0.5*v[im2[i]]))*dxi;
+	//        else                    rhsY[i] = +uAtV[i]*(0.5*phi*(v[ip1[i]]-v[im1[i]])+(1.0-phi)*(1.5*v[i]-2.0*v[ip1[i]]+0.5*v[ip2[i]]))*dxi;
+	//
+	//        if (v[i] > 0.0)         rhsY[i] -= v[i]*(0.5*phi*(v[jp1[i]]-v[jm1[i]])+(1.0-phi)*(1.5*v[i]-2.0*v[jm1[i]]+0.5*v[jm2[i]]))*dxi;
+	//        else                    rhsY[i] += v[i]*(0.5*phi*(v[jp1[i]]-v[jm1[i]])+(1.0-phi)*(1.5*v[i]-2.0*v[jp1[i]]+0.5*v[jp2[i]]))*dxi;
+	//
+	//        rhsY[i] += dx2Rei*(v[ip1[i]] + v[im1[i]] + v[jp1[i]] + v[jm1[i]] - 4*v[i]);
+	//        rhsY[i] -= (p[jp1[i]] - p[i])*dxi;
+	//    }
+
+	// IB forcing
+	for (int obj=0; obj<ibObj.size(); obj++) {
 		for (int ib=0; ib<ibObj[obj].iIB.size(); ib++) {
 			int i = ibObj[obj].iIB[ib].i-1;
-			int j = ibObj[obj].iIB[ib].j-1;  	  rhsX[ind(i,j)] += (- dx2Rei*(u[ind(i,j+1)]+u[ind(i,j)]));
-				i = ibObj[obj].iIB[ib].i;         rhsX[ind(i,j)] += (- dx2Rei*(u[ind(i,j+1)]+u[ind(i,j)]));
-				j = ibObj[obj].iIB[ib].j+1;       rhsX[ind(i,j)] -= (+ dx2Rei*(u[ind(i,j)]+u[ind(i,j-1)]));
-				i = ibObj[obj].iIB[ib].i-1;       rhsX[ind(i,j)] -= (+ dx2Rei*(u[ind(i,j)]+u[ind(i,j-1)]));
-				j = ibObj[obj].iIB[ib].j-1;       rhsY[ind(i,j)] += (- dx2Rei*(v[ind(i+1,j)]+v[ind(i,j)]));
-				j = ibObj[obj].iIB[ib].j;         rhsY[ind(i,j)] += (- dx2Rei*(v[ind(i+1,j)]+v[ind(i,j)]));
-				i = ibObj[obj].iIB[ib].i+1;       rhsY[ind(i,j)] -= (+ dx2Rei*(v[ind(i,j)]+v[ind(i-1,j)]));
-				j = ibObj[obj].iIB[ib].j-1;       rhsY[ind(i,j)] -= (+ dx2Rei*(v[ind(i,j)]+v[ind(i-1,j)]));
+			int j = ibObj[obj].iIB[ib].j-1;        rhsX[ind(i,j)] += (- dx2Rei*(u[ind(i,j+1)]+u[ind(i,j)]));
+			i = ibObj[obj].iIB[ib].i;         rhsX[ind(i,j)] += (- dx2Rei*(u[ind(i,j+1)]+u[ind(i,j)]));
+			j = ibObj[obj].iIB[ib].j+1;       rhsX[ind(i,j)] -= (+ dx2Rei*(u[ind(i,j)]+u[ind(i,j-1)]));
+			i = ibObj[obj].iIB[ib].i-1;       rhsX[ind(i,j)] -= (+ dx2Rei*(u[ind(i,j)]+u[ind(i,j-1)]));
+			j = ibObj[obj].iIB[ib].j-1;       rhsY[ind(i,j)] += (- dx2Rei*(v[ind(i+1,j)]+v[ind(i,j)]));
+			j = ibObj[obj].iIB[ib].j;         rhsY[ind(i,j)] += (- dx2Rei*(v[ind(i+1,j)]+v[ind(i,j)]));
+			i = ibObj[obj].iIB[ib].i+1;       rhsY[ind(i,j)] -= (+ dx2Rei*(v[ind(i,j)]+v[ind(i-1,j)]));
+			j = ibObj[obj].iIB[ib].j-1;       rhsY[ind(i,j)] -= (+ dx2Rei*(v[ind(i,j)]+v[ind(i-1,j)]));
 		}
-    }
+	}
 }
 
 
 
 void calcPoissonRHS() {
-    float dtdxi = 1.0/dt/dx;
+	float dtdxi = 1.0/dt/dx;
 #pragma omp parallel for num_threads(NUM_THREADS)
 	for(int i=1; i<imax-1; i++)
-	for(int j=1; j<jmax-1; j++)
-	    pp[indp(i-1,j-1)] = dtdxi*(us[ind(i,j)] - us[ind(i-1,j)] + vs[ind(i,j)] - vs[ind(i,j-1)]);
+		for(int j=1; j<jmax-1; j++)
+			pp[indp(i-1,j-1)] = dtdxi*(us[ind(i,j)] - us[ind(i-1,j)] + vs[ind(i,j)] - vs[ind(i,j-1)]);
 }
 
 
 
 void solvePressureDCTPxNy()
 {
-    int m = imax-2;
-    int n = jmax-2;
+	int m = imax-2;
+	int n = jmax-2;
 
 	fftwf_execute(dctPxNy);
 	for (int i=0; i<m*n; i++)   pp[i] /= evPxNy[i];
@@ -833,8 +833,8 @@ void solvePressureDCTPxNy()
 
 void solvePressureDCTPxPy()
 {
-    int m = imax-2;
-    int n = jmax-2;
+	int m = imax-2;
+	int n = jmax-2;
 
 	fftwf_execute(dctPxPy);
 	for (int i=0; i<m*n; i++)   pp[i] /= evPxPy[i];
@@ -854,34 +854,34 @@ void solvePressureDCTPxPy()
 
 void solvePressureTDMAxDCTy()
 {
-    int m = imax-2;
-    int n = jmax-2;
+	int m = imax-2;
+	int n = jmax-2;
 
-    float evyLoc[n];
+	float evyLoc[n];
 
-//	for(int i=0; i<m; i++)
-//	for(int j=0; j<n; j++)
-//	    pp[i*n+j] = cos(2.0*M_PI*(j+0.5)/n);
-//
-//FILE *fp = fopen("dummy","wt");
-////	for(int i=0; i<m; i++) {
-//	for(int j=0; j<n; j++) {
-//		int i = 10;
-//		fprintf(fp, "%lf\t%lf\n", 1.0*(j+0.5)/n, pp[i*n+j]);
-//	}
-//fclose(fp);
+	//    for(int i=0; i<m; i++)
+	//    for(int j=0; j<n; j++)
+	//        pp[i*n+j] = cos(2.0*M_PI*(j+0.5)/n);
+	//
+	//FILE *fp = fopen("dummy","wt");
+	////    for(int i=0; i<m; i++) {
+	//    for(int j=0; j<n; j++) {
+	//        int i = 10;
+	//        fprintf(fp, "%lf\t%lf\n", 1.0*(j+0.5)/n, pp[i*n+j]);
+	//    }
+	//fclose(fp);
 
 	// perform dct in y-direction
 	switch (wall) {
 	case 1:
 	case 2:
 		fftwf_execute(dctNy);
-	    for (int j=0; j<n; j++)  evyLoc[j] = evNy[j];
+		for (int j=0; j<n; j++)  evyLoc[j] = evNy[j];
 		break;
 	case 3:
 		fftwf_execute(dctPy);
-	    for (int j=0; j<n; j++)  evyLoc[j] = evPy[j];
-	    break;
+		for (int j=0; j<n; j++)  evyLoc[j] = evPy[j];
+		break;
 	}
 
 	// use Thomas algorithm to solve in x-direction
@@ -900,7 +900,7 @@ void solvePressureTDMAxDCTy()
 		pp[j] = pp[j]*z;
 	}
 
-//#pragma omp parallel for num_threads(NUM_THREADS)
+	//#pragma omp parallel for num_threads(NUM_THREADS)
 	for (int i=1; i<m-1; i++) {
 		for (int j=0; j<n; j++) {
 			float z = 1./(b[i]+evyLoc[j]-a[i]*d[(i-1)*n+j]);
@@ -917,7 +917,7 @@ void solvePressureTDMAxDCTy()
 			pp[(m-1)*n+j] = 0.0;
 	}
 
-//#pragma omp parallel for num_threads(NUM_THREADS)
+	//#pragma omp parallel for num_threads(NUM_THREADS)
 	for (int i=m-2; i>=0; i--)
 		for (int j=0; j<n; j++)
 			pp[i*n+j] = pp[i*n+j]-d[i*n+j]*pp[(i+1)*n+j];
@@ -946,14 +946,14 @@ void solvePressureTDMAxDCTy()
 
 
 
-//	fp = fopen("dummy2","wt");
-////		for(int i=1; i<imax-1; i++) {
-//		for(int j=1; j<jmax-1; j++) {
-//			int i = 10;
-//			fprintf(fp, "%lf\t%lf\n", 1.0*(j-0.5)/n, 1./pow(2.0*M_PI, -2.0)*ps[ind(i,j)]-0);
-//		}
-//	fclose(fp);
-//	exit(0);
+	//    fp = fopen("dummy2","wt");
+	////        for(int i=1; i<imax-1; i++) {
+	//        for(int j=1; j<jmax-1; j++) {
+	//            int i = 10;
+	//            fprintf(fp, "%lf\t%lf\n", 1.0*(j-0.5)/n, 1./pow(2.0*M_PI, -2.0)*ps[ind(i,j)]-0);
+	//        }
+	//    fclose(fp);
+	//    exit(0);
 }
 
 
