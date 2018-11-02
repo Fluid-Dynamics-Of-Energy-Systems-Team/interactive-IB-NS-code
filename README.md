@@ -26,5 +26,4 @@ Known issues / things to do:
 
 have fun...
 
-Rene
 
