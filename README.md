@@ -15,8 +15,11 @@ To change number of threads for openMP, change the setting in the "defines.h".
 There are two defines: NUM_THREADS for the loops and NUM_THREADS_FFT for FFTW. 
 
 
+
 Known issues / things to do: 
+
 1.) IB not completely implemented for QUICK scheme
+
 2.) for the sake of computational speed, pressure only solved after RK sub-steps
 
 
