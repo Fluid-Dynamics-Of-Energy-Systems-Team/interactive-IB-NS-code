@@ -26,6 +26,6 @@ Known issues / things to do:
 
 
 
-have fun...
+have fun and let me know your opinion ...
 
 
