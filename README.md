@@ -5,11 +5,11 @@ interactive immersed boundary incompressible Navier-Stokes solver
 
 Required libraries: 
 
-1.) openMP
+1.) openMP (if homebrew installed on MAC OS, simply use: brew install clang-omp)
 
-2.) FFTW (use ./configure --enable-float --enable-threads)
+2.) FFTW, http://www.fftw.org/download.html (use: ./configure --enable-float --enable-threads)
 
-3.) OpenGL utility toolkit (glut). If homebrew installed on MAC OS, simply use: "brew install freeglut"
+3.) OpenGL utility toolkit (glut) (use: brew install freeglut)
 
 Adapt locations of libs in the Makefile (for OSX) and make the code. 
 
