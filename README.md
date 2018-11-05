@@ -11,7 +11,7 @@ Required libraries:
 
 3.) OpenGL utility toolkit (glut) (use: brew install freeglut)
 
-Adapt locations of libs in the Makefile (for OSX) and make the code. 
+Adapt locations of libs in the Makefile (for OSX) and run "make".  
 
 To change number of threads for openMP, change the setting in "defines.h". 
 There are two defines: NUM_THREADS for the loops and NUM_THREADS_FFT for FFTW. 
