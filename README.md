@@ -1,5 +1,5 @@
 # interactive-IB-NS-code
-interactive immersed boundary incompressible Navier-Stokes code 
+interactive immersed boundary incompressible Navier-Stokes solver 
 
 ![porsche](http://dutw1479.wbmt.tudelft.nl/~renep/images/porsche.png)
 
