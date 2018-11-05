@@ -1,6 +1,8 @@
 # interactive-IB-NS-code
 interactive immersed boundary incmpressible Navier-Stokes code 
 
+![porsche](http://dutw1479.wbmt.tudelft.nl/~renep/images/porsche.png)
+
 Required libraries: 
 
 1.) openMP
