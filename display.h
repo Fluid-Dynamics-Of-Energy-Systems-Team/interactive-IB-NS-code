@@ -20,13 +20,15 @@
 #include <algorithm>
 using namespace std;
 
-
-//#include "GL/gl.h"
-//#include "GL/glu.h"
-//#include "GL/glut.h"
-#include "/opt/X11/include/GL/gl.h"
-#include "/opt/X11/include/GL/glu.h"
-#include "/opt/X11/include/GL/glut.h"
+#ifdef LINUX
+  #include "GL/gl.h"
+  #include "GL/glu.h"
+  #include "GL/glut.h"
+#else
+  #include "/opt/X11/include/GL/gl.h"
+  #include "/opt/X11/include/GL/glu.h"
+  #include "/opt/X11/include/GL/glut.h"
+#endif
 
 
 #include "point.h"
