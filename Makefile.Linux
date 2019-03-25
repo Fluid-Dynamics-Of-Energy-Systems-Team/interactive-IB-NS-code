@@ -8,15 +8,15 @@ TRILIBDEFS = -DSINGLE -DTRILIBRARY -DANSI_DECLARATORS
 INCGL = /usr/include/GL/
 
 
-INCFFT = /home/renep/Libraries/fftw3/include/
-LIBFFT = /home/renep/Libraries/fftw3/lib/
+#INCFFT = /home/renep/Libraries/fftw3/include/
+#LIBFFT = /home/renep/Libraries/fftw3/lib/
 
 
 # Define compiler and optimizer's flags
-CC = g++ -pthread -O3 #-Wno-c++11-extensions #-Rpass=loop-vectorize -Rpass-missed=loop-vectorize -Rpass-analysis=loop-vectorize 
+CC = g++ -pthread -O3 -DLINUX #-Wno-c++11-extensions #-Rpass=loop-vectorize -Rpass-missed=loop-vectorize -Rpass-analysis=loop-vectorize 
 
 CFLAGS = -I$(INCGL) -I$(INCFFT) -L$(LIBFFT) 
-LIBS = -lGLU -lGL -lglut -lfftw3f_threads -lfftw3f  -lm -lomp
+LIBS = -lGLU -lGL -lglut -lfftw3f_threads -lfftw3f  -lm -lopenmp
 
 # List of objects
 OBJ_SRC = main.o\
