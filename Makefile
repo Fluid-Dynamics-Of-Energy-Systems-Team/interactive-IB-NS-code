@@ -2,7 +2,6 @@
 # It can be different from the folder in which you want to compile and run the mesh generator. 
 # In the current directory ./ you only need to have the main.cpp and this Makefile
 
-
 TRILIBDEFS = -DSINGLE -DTRILIBRARY -DANSI_DECLARATORS
 
 INC_GL = /opt/X11/include/
@@ -19,20 +18,19 @@ CFLAGS = -I$(INC_GL) -L$(LIB_GL) -I$(INC_OMP) -L$(LIB_OMP)
 
 LIBS = -lGLU -lGL -lglut $(OMPLIB) -lm -lomp
 
+TARGET = incomp
 
 # List of objects
 OBJ_SRC = main.o\
 	point.o\
 	triangle.o
 
+OBJ = $(OBJ_SRC)
 
+all: $(TARGET)
 
-OBJ =$(OBJ_SRC)
-
-all:	incomp
-
-incomp: $(OBJ) 
-		$(CC) $(CFLAGS) -o incomp $(OBJ) -lm $(LIBS) 
+$(TARGET): $(OBJ) 
+		$(CC) $(CFLAGS) -o $(TARGET) $(OBJ) -lm $(LIBS) 
 
 main.o: main.cpp ib.h display.h defines.h globals.h
 	$(CC) $(CFLAGS) -c $< -o $@
@@ -43,7 +41,5 @@ point.o: point.cpp point.h
 triangle.o: triangle.c triangle.h
 	$(CC) $(CSWITCHES) $(TRILIBDEFS) -c $< -o $@
 
-
-
 clean:
-		rm incomp $(OBJ)
+		rm -rf $(TARGET) $(OBJ)

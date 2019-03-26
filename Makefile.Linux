@@ -2,37 +2,32 @@
 # It can be different from the folder in which you want to compile and run the mesh generator. 
 # In the current directory ./ you only need to have the main.cpp and this Makefile
 
-
 TRILIBDEFS = -DSINGLE -DTRILIBRARY -DANSI_DECLARATORS
 
 INCGL = /usr/include/GL/
 
-
 #INCFFT = /home/renep/Libraries/fftw3/include/
 #LIBFFT = /home/renep/Libraries/fftw3/lib/
-
 
 # Define compiler and optimizer's flags
 CC = g++ -pthread -O3 -DLINUX #-Wno-c++11-extensions #-Rpass=loop-vectorize -Rpass-missed=loop-vectorize -Rpass-analysis=loop-vectorize 
 
-CFLAGS = -I$(INCGL) -I$(INCFFT) -L$(LIBFFT) 
-LIBS = -lGLU -lGL -lglut -lfftw3f_threads -lfftw3f  -lm -lopenmp
+CFLAGS = #-I$(INCGL) -I$(INCFFT) -L$(LIBFFT) 
+LIBS = -lGLU -lGL -lglut -lfftw3f_threads -lfftw3f  -lm -fopenmp
+
+TARGET = incomp
 
 # List of objects
 OBJ_SRC = main.o\
 	point.o\
 	triangle.o
-#			unstruct.o\
-#			transform.o
-
-
 
 OBJ =$(OBJ_SRC)
 
-all:	incomp.linux
+all: $(TARGET)
 
-incomp: $(OBJ) 
-		$(CC) $(CFLAGS) -o incomp $(OBJ) -lm $(LIBS) 
+$(TARGET): $(OBJ) 
+		$(CC) $(CFLAGS) -o $(TARGET) $(OBJ) -lm $(LIBS) 
 
 main.o: main.cpp ib.h display.h defines.h globals.h
 	$(CC) $(CFLAGS) -c $< -o $@
@@ -46,7 +41,5 @@ point.o: point.cpp point.h
 triangle.o: triangle.c triangle.h
 	$(CC) $(CSWITCHES) $(TRILIBDEFS) -c $< -o $@
 
-
-
 clean:
-		rm incomp $(OBJ)
+		rm -rf $(TARGET) $(OBJ)
