@@ -31,7 +31,8 @@
 
 
 
-#include "stdio.h"
+#include <iostream>
+#include <stdio.h>
 #include "stdlib.h"
 #include "math.h"
 #include <ctime>
@@ -67,7 +68,8 @@ int main(int argc, char** argv)
 
 	initFlowField();
 
-	IBObject obj = IBObject("objects/nozzle1.txt", dx, imax, jmax);
+
+	IBObject obj = IBObject("objects/square.txt", dx, imax, jmax);
 	obj.translate(POINT(-0.5, 0.0));
 	ibObj.push_back(obj);
 
